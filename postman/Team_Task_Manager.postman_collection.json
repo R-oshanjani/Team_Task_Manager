@@ -1,0 +1,741 @@
+{
+	"info": {
+		"_postman_id": "b3e9a7e1-8f4d-4e92-bbf1-8a9012345678",
+		"name": "Team Task Manager API",
+		"description": "Comprehensive Postman collection for Team Task Manager REST APIs. Includes Authentication, Users, Projects, Tasks, Comments, and Notifications.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://127.0.0.1:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "projectId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "taskId",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "commentId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"david_dev\",\n    \"email\": \"david@teamtask.com\",\n    \"first_name\": \"David\",\n    \"last_name\": \"Miller\",\n    \"password\": \"EmployeePassword123!\",\n    \"confirm_password\": \"EmployeePassword123!\",\n    \"role\": \"EMPLOYEE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register", ""]
+						}
+					}
+				},
+				{
+					"name": "Login (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.collectionVariables.set('accessToken', jsonData.access);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.refresh);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"AdminPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Login (Manager)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"manager_sarah\",\n    \"password\": \"ManagerPassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Login (Employee)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"john_dev\",\n    \"password\": \"EmployeePassword123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login", ""]
+						}
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token/refresh/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "token", "refresh", ""]
+						}
+					}
+				},
+				{
+					"name": "Current User Profile (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "me", ""]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refreshToken}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout/",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Users",
+			"item": [
+				{
+					"name": "Get Users List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Team Members List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/users/team_members/",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "team_members", ""]
+						}
+					}
+				},
+				{
+					"name": "Update User Role (Admin Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"MANAGER\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/3/",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "3", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Projects",
+			"item": [
+				{
+					"name": "Get Projects",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/projects/?status=Active",
+							"host": ["{{baseUrl}}"],
+							"path": ["projects", ""],
+							"query": [
+								{
+									"key": "status",
+									"value": "Active"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Project",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"FinTech Analytics Platform\",\n    \"description\": \"Real-time streaming telemetry and compliance reporting.\",\n    \"start_date\": \"2026-11-01\",\n    \"end_date\": \"2027-02-28\",\n    \"status\": \"Planning\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/projects/",
+							"host": ["{{baseUrl}}"],
+							"path": ["projects", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Project Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/projects/{{projectId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["projects", "{{projectId}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Project Tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/projects/{{projectId}}/tasks/",
+							"host": ["{{baseUrl}}"],
+							"path": ["projects", "{{projectId}}", "tasks", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Project",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Active\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/projects/{{projectId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["projects", "{{projectId}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Project (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/projects/{{projectId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["projects", "{{projectId}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Tasks",
+			"item": [
+				{
+					"name": "Get All Tasks (Filtered & Paginated)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/?page=1&status=In Progress&priority=High",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", ""],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "status",
+									"value": "In Progress"
+								},
+								{
+									"key": "priority",
+									"value": "High"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/?search=Login API",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", ""],
+							"query": [
+								{
+									"key": "search",
+									"value": "Login API"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get My Assigned Tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/my-tasks/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "my-tasks", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Dashboard Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/dashboard-stats/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "dashboard-stats", ""]
+						}
+					}
+				},
+				{
+					"name": "Create Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Develop Authentication Endpoints\",\n    \"description\": \"Build JWT-based authentication endpoints with refresh token rotation.\",\n    \"project\": 1,\n    \"assigned_to\": 3,\n    \"priority\": \"High\",\n    \"status\": \"To Do\",\n    \"due_date\": \"2026-11-20\",\n    \"progress\": 0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Task Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/{{taskId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "{{taskId}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Task Status & Progress",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"Completed\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks/{{taskId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "{{taskId}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Task (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/{{taskId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "{{taskId}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Comments",
+			"item": [
+				{
+					"name": "Get Task Comments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/{{taskId}}/comments/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "{{taskId}}", "comments", ""]
+						}
+					}
+				},
+				{
+					"name": "Add Task Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"comment\": \"PR is ready for code review on GitHub: https://github.com/org/repo/pull/42\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks/{{taskId}}/comments/",
+							"host": ["{{baseUrl}}"],
+							"path": ["tasks", "{{taskId}}", "comments", ""]
+						}
+					}
+				},
+				{
+					"name": "Update Comment (Author Only)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"comment\": \"Updated comment with revised benchmark results.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["comments", "{{commentId}}", ""]
+						}
+					}
+				},
+				{
+					"name": "Delete Comment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}/",
+							"host": ["{{baseUrl}}"],
+							"path": ["comments", "{{commentId}}", ""]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Notifications",
+			"item": [
+				{
+					"name": "Get My Notifications",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", ""]
+						}
+					}
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/unread-count/",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "unread-count", ""]
+						}
+					}
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/1/read/",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "1", "read", ""]
+						}
+					}
+				},
+				{
+					"name": "Mark All Notifications as Read",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/read-all/",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "read-all", ""]
+						}
+					}
+				}
+			]
+		}
+	]
+}
